@@ -1,40 +1,177 @@
-<!-- 可以直接复制这段作为 index.html 测试 -->
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<title>MC服务器状态查询</title>
-<style>
-body{font-family:system-ui;max-width:600px;margin:60px auto;padding:0 20px;}
-.box{border:1px solid #ddd;padding:24px;border-radius:12px;}
-.online{color:#2ea043;}
-.offline{color:#cf222e;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>墨白的养老小服 - 主页</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100%;
+        }
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #43a047, #66bb6a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom:8px;
+        }
+        .status-card{
+            background:rgba(255,255,255,0.02);
+            border-radius:18px;
+            padding:24px;
+            border:1px solid rgba(255,255,255,0.04);
+            margin-bottom:28px;
+        }
+        .status-title{
+            font-size:1.2rem;
+            margin-bottom:16px;
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+        .dot-online{
+            width:12px;height:12px;
+            background:#43a047;
+            border-radius:50%;
+            display:inline-block;
+        }
+        .dot-offline{
+            width:12px;height:12px;
+            background:#ef4444;
+            border-radius:50%;
+            display:inline-block;
+        }
+        .dot-loading{
+            width:12px;height:12px;
+            background:#facc15;
+            border-radius:50%;
+            display:inline-block;
+            animation:pulse 1.2s infinite;
+        }
+        @keyframes pulse{
+            0%,100%{opacity:1}
+            50%{opacity:0.3}
+        }
+        /* 玩家头像标签样式 */
+        .player-wrap{
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            margin-top:12px;
+        }
+        .player-card{
+            display:flex;
+            align-items:center;
+            gap:8px;
+            padding:7px 12px;
+            background:#0f0f1a;
+            border-radius:10px;
+            border:1px solid rgba(255,255,255,0.06);
+        }
+        .player-avatar{
+            width:28px;
+            height:28px;
+            border-radius:4px;
+            object-fit:cover;
+        }
+        .btn-group{
+            display:flex;
+            gap:16px;
+            flex-wrap:wrap;
+            justify-content:center;
+        }
+        .nav-btn {
+            color: #ccc;
+            text-decoration: none;
+            padding: 10px 26px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.06);
+            transition: 0.25s;
+            border: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.95rem;
+        }
+        .nav-btn:hover {
+            background: #43a047;
+            color: #0f0f1a;
+            border-color: #43a047;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .container {
+                padding: 22px;
+                border-radius: 18px;
+            }
+            .header h1 { font-size: 1.4rem; }
+            .nav-btn { font-size: 0.8rem; padding: 8px 18px; border-radius: 24px; }
+            .player-card{
+                padding:6px 10px;
+            }
+            .player-avatar{
+                width:24px;
+                height:24px;
+            }
+        }
+        @media (max-width: 400px) {
+            body { padding: 8px; }
+            .container {
+                padding: 16px;
+                border-radius: 14px;
+            }
+            .header h1 { font-size: 1.1rem; }
+            .nav-btn { font-size: 0.75rem; padding:6px 14px; border-radius: 20px; }
+        }
+    </style>
 </head>
 <body>
-<div class="box">
-  <h2>我的世界服务器状态</h2>
-  <div id="status">正在加载...</div>
-</div>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 墨白的养老小服</h1>
+            <p style="color:#aaa">Minecraft 生存服务器</p>
+        </div>
+
+        <div class="status-card">
+            <div class="status-title">
+                <span id="status-dot" class="dot-loading"></span>
+                <span>服务器实时状态</span>
+            </div>
+            <div id="server-status">
+                正在查询服务器信息...
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <a href="map.html" class="nav-btn">🗺️ 进入世界地图</a>
+        </div>
+    </div>
+
 <script>
-const serverAddr = "mc4.mobbb.top"; // 修改为你的服务器IP/域名
-function fetchStatus(){
-  const script = document.createElement("script");
-  script.src = `https://api.mcsrvstat.us/2/${serverAddr}?callback=renderResult`;
-  document.body.appendChild(script);
-}
-window.renderResult = function(data){
-  const dom = document.getElementById("status");
-  if(data.online){
-    dom.innerHTML = `<p class="online">✅ 服务器在线</p>
-    <p>在线玩家：${data.players.online}/${data.players.max}</p>
-    <p>版本：${data.version}</p>`;
-  }else{
-    dom.innerHTML = `<p class="offline">❌ 服务器离线</p>`;
-  }
-};
-fetchStatus();
-setInterval(fetchStatus,30000); //30秒刷新一次
-</script>
-</body>
-</html>
+const MC_HOST = "mc.mobbb.top";
+const MC_PORT = 25565;
+const dotEl = document.getElementById("status-dot");
+const b
