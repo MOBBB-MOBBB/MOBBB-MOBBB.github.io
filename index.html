@@ -1,0 +1,40 @@
+<!-- 可以直接复制这段作为 index.html 测试 -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>MC服务器状态查询</title>
+<style>
+body{font-family:system-ui;max-width:600px;margin:60px auto;padding:0 20px;}
+.box{border:1px solid #ddd;padding:24px;border-radius:12px;}
+.online{color:#2ea043;}
+.offline{color:#cf222e;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>我的世界服务器状态</h2>
+  <div id="status">正在加载...</div>
+</div>
+<script>
+const serverAddr = "mc4.mobbb.top"; // 修改为你的服务器IP/域名
+function fetchStatus(){
+  const script = document.createElement("script");
+  script.src = `https://api.mcsrvstat.us/2/${serverAddr}?callback=renderResult`;
+  document.body.appendChild(script);
+}
+window.renderResult = function(data){
+  const dom = document.getElementById("status");
+  if(data.online){
+    dom.innerHTML = `<p class="online">✅ 服务器在线</p>
+    <p>在线玩家：${data.players.online}/${data.players.max}</p>
+    <p>版本：${data.version}</p>`;
+  }else{
+    dom.innerHTML = `<p class="offline">❌ 服务器离线</p>`;
+  }
+};
+fetchStatus();
+setInterval(fetchStatus,30000); //30秒刷新一次
+</script>
+</body>
+</html>
