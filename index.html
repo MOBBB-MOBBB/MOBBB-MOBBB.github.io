@@ -86,7 +86,7 @@
 
         .info-grid{
             display:grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
             gap:16px;
             margin-bottom:24px;
         }
@@ -250,14 +250,6 @@
                             <div class="label">在线玩家</div>
                             <div class="val-online"><span id="onlinePlayers">0</span>/<span id="maxPlayers">0</span></div>
                         </div>
-                        <div class="info-card">
-                            <div class="label">网络延迟(ms)</div>
-                            <div class="val-online" id="serverPing">--</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="label">游戏版本</div>
-                            <div class="val-online" id="serverVersion">--</div>
-                        </div>
                     </div>
 
                     <div class="motd-box">
@@ -303,19 +295,6 @@ function queryServer() {
         // 在线人数
         document.getElementById('onlinePlayers').innerText = data.players?.online || 0;
         document.getElementById('maxPlayers').innerText = data.players?.max || 0;
-
-        // 【修复】兼容ping不存在的情况
-        let pingText = data.ping;
-        document.getElementById('serverPing').innerText = pingText ?? "暂无数据";
-
-        // 【修复】版本多重兼容，防止空白/未知
-        let verText = "未知";
-        if(data.version){
-            if(data.version.name_clean) verText = data.version.name_clean;
-            else if(data.version.name) verText = data.version.name;
-            else if(data.version.protocol) verText = `协议:${data.version.protocol}`;
-        }
-        document.getElementById('serverVersion').innerText = verText;
 
         // MOTD
         let motdText = data.motd?.clean?.join('\n') || "";
